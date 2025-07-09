@@ -44,7 +44,7 @@ macro_rules! get_http_param {
 }
 
 pub struct Handlers {
-    pub postfeed: PostFeedHandler,
+    pub post_feed: PostFeedHandler,
     pub post_post: PostPostHandler,
     pub post: PostHandler,
 }
@@ -52,9 +52,9 @@ pub struct Handlers {
 impl Handlers {
     pub fn new(db: Database) -> Handlers {
         let database = Arc::new(Mutex::new(db));
-        Handler {
+        Handlers {
             post_feed: PostFeedHandler::new(database.clone()),
-            post_post: PoostPostHandler::new(database.clone()),
+            post_post: PostPostHandler::new(database.clone()),
             post: PostHandler::new(database.clone()),
         }
     }
@@ -82,10 +82,10 @@ pub struct PostPostHandler {
 }
 impl PostPostHandler{
     fn new(database: Arc<Mutex<Database>>) -> PostPostHandler {
-        PoostPostHandler{database}
+        PostPostHandler{database}
     }
 }
-impl Handler for PoostPostHandler {
+impl Handler for PostPostHandler {
     fn handle(&self, req: &mut Request) -> IronResult<Response> {
         let mut payload = String::new();
         try_handler!(req.body.read_to_string(&mut payload));
@@ -93,7 +93,7 @@ impl Handler for PoostPostHandler {
         let post = try_handler!(json::decode(&payload), status::BadRequest);
 
         lock!(self.database).add_post(post);
-        Ok(Response::with((status::created, payload)))
+        Ok(Response::with((status::Created, payload)))
     }
 }
 
@@ -114,7 +114,7 @@ impl Handler for PostHandler{
     fn handle(&self, req: &mut Request) -> IronResult<Response>{
         let ref post_id = get_http_param!(req, "id");
         
-        let id = try_handler(Uuid::parse_str(post_id), status::BadRequest);
+        let id = try_handler!(Uuid::parse_str(post_id),status::BadRequest);
 
         if let Some(post) =  self.find_post(&id){
             let payload = try_handler!(json::encode(&post), status::InternalServerError);

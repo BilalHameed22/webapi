@@ -10,7 +10,7 @@ mod models;
 mod database;
 mod handlers;
 
-use model::*;
+use models::*;
 use database::Database;
 use handlers::*;
 
