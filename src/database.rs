@@ -1,4 +1,4 @@
-use models::Post;
+use crate::models::Post;
 
 #[derive(Debug, Clone)]
 pub struct Database {
