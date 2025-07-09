@@ -6,8 +6,14 @@ extern crate router;
 extern crate rustc_serialize;
 extern crate uuid;
 
-mod model;
+mod models;
 mod database;
+mod handlers;
+
+use model::*;
+use database::Database;
+use handlers::*;
+
 fn main() {
     println!("Hello, world!");
 }
